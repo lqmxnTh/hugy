@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hug ME!</title>
+  <style>
+    body {
+      margin: 0;
+      background: white;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      touch-action: none; /* Prevent scrolling on touch */
+    }
+
+    #game {
+      position: relative;
+      width: 90%;
+      max-width: 800px;
+      height: 200px;
+      border-bottom: 4px solid black;
+      overflow: hidden;
+    }
+
+    .block {
+      position: absolute;
+      width: 40px;
+      background: white;
+      /* border: 4px solid black; */
+      bottom: 4px;
+      touch-action: none;
+      transition: left 0.05s linear, right 0.05s linear;
+    }
+
+    #leftBlock {
+      left: 10%;
+    }
+
+    #rightBlock {
+      right: 10%;
+    }
+
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      font-family: "Brush Script MT", "Lucida Handwriting", cursive;
+      font-weight: normal;
+      color: rgb(209, 128, 141);
+      visibility: hidden;
+      z-index: 1000;
+      transition: opacity 0.8s ease;
+      opacity: 0;
+    }
+
+    #overlay.show {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="leftBlock" class="block"><img width="150%" src="https://media.tenor.com/fBjCdFDOYQwAAAAj/bubu-dudu-sseeyall.gif" alt=""></div>
+    <div id="rightBlock" class="block"><img width="150%" src="https://media.tenor.com/yZoKXA08ZyYAAAAi/bubu-bubu-dudu.gif" alt="" srcset=""></div>
+  </div>
+
+  <div id="overlay">Love youuuu <br/> <img width="75%" src="https://media.tenor.com/2bw-Zzp-mTMAAAAi/bear-hug.gif" alt=""><br/>soooo soo much</div>
+
+  <script>
+    const leftBlock = document.getElementById('leftBlock');
+    const rightBlock = document.getElementById('rightBlock');
+    const overlay = document.getElementById('overlay');
+    const game = document.getElementById('game');
+
+    const blockWidth = 48; // 40px + 4px borders each side
+    let leftX = game.offsetWidth * 0.1;
+    let rightX = game.offsetWidth * 0.1;
+
+    let isDragging = false;
+    let startTouchX = 0;
+    let startLeftX = 0;
+
+    leftBlock.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startTouchX = e.touches[0].clientX;
+      startLeftX = leftX;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const gameWidth = game.offsetWidth;
+      const center = gameWidth / 2;
+
+      const deltaX = e.touches[0].clientX - startTouchX;
+      const newLeftX = Math.max(startLeftX + deltaX, startLeftX);
+
+      const leftRightEdge = newLeftX + blockWidth;
+      const rightLeftEdge = gameWidth - rightX - blockWidth;
+
+      if (leftRightEdge >= rightLeftEdge) {
+        overlay.classList.add('show');
+        isDragging = false;
+        return;
+      }
+
+      if (leftRightEdge < center) {
+        leftX = newLeftX;
+        rightX = newLeftX - gameWidth * 0.1;
+        if (rightX < 0) rightX = 0;
+        leftBlock.style.left = leftX + 'px';
+        rightBlock.style.right = rightX + 'px';
+      }
+    });
+
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    window.addEventListener('resize', () => {
+      const gameWidth = game.offsetWidth;
+      leftX = gameWidth * 0.1;
+      rightX = gameWidth * 0.1;
+      leftBlock.style.left = leftX + 'px';
+      rightBlock.style.right = rightX + 'px';
+      overlay.classList.remove('show');
+    });
+  </script>
+</body>
+</html>
